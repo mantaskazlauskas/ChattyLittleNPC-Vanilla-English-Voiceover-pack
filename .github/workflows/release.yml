@@ -17,16 +17,16 @@ jobs:
 
       - name: Debug zip file name
         run: |
-          echo "Expected zip: ${{ github.ref_name }}.zip"
+          echo "Expected zip: ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip"
           ls -lh
 
       - name: Create Addon ZIP
         run: |
-          zip -r "${{ github.ref_name }}.zip" ChattyLittleNpc_Vanilla_voiceovers
+          zip -r "ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip" ChattyLittleNpc_Vanilla_voiceovers
 
       - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: "${{ github.ref_name }}.zip"
+          files: "ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
