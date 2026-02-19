@@ -19,6 +19,16 @@ jobs:
         run: |
           echo "Expected zip: ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip"
           ls -lh
+                    
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate VoiceoversList.lua
+        run: |
+          cd ChattyLittleNpc_Vanilla_voiceovers
+          python generate_voicovers_list_file.py
 
       - name: Create Addon ZIP
         run: |
