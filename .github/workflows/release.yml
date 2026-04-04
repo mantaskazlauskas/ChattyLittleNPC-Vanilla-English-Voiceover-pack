@@ -25,6 +25,9 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Install dependencies
+        run: pip install mutagen
+
       - name: Generate VoiceoversList.lua
         run: |
           cd ChattyLittleNpc_Vanilla_voiceovers
