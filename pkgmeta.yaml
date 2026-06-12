@@ -1,0 +1,8 @@
+package-as: ChattyLittleNpc_Vanilla_voiceovers
+ignore:
+  - release.py
+  - README.md
+  - .vscode
+  - .github
+  - .venv
+  - .luarc.json
