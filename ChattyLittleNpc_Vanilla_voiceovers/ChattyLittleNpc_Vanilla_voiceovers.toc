@@ -1,4 +1,4 @@
-## Interface: 120100, 120007, 50504, 40402, 30405, 20506, 11509, 11508
+## Interface: 120100, 120007, 50504, 40402, 30405, 20506, 16001, 11509
 ## Title: Chatty Little NPC: Vanilla voiceovers
 ## Notes: This is a quest voiceover pack for Chatty Little NPC addon.
 ## Author: Tuubby
