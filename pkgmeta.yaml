@@ -1,6 +1,7 @@
 package-as: ChattyLittleNpc_Vanilla_voiceovers
 ignore:
   - release.py
+  - deploy.py
   - README.md
   - .vscode
   - .github
