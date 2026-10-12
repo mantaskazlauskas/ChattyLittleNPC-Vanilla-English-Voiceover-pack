@@ -18,7 +18,8 @@
         "SetDesaturation",
         "ColorPickerFrame",
         "OKAY",
-        "NOT_BOUND"
+        "NOT_BOUND",
+        "English"
     ],
     "Lua.runtime.version": "Lua 5.1",
     "Lua.runtime.builtin": {
