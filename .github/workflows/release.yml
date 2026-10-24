@@ -15,11 +15,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug zip file name
-        run: |
-          echo "Expected zip: ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip"
-          ls -lh
-                    
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -28,18 +23,25 @@ jobs:
       - name: Install dependencies
         run: pip install mutagen
 
-      - name: Generate VoiceoversList.lua
-        run: |
-          cd ChattyLittleNpc_Vanilla_voiceovers
-          python generate_voicovers_list_file.py
+      - name: Generate VoiceoversList.lua for every locale
+        run: python generate_voiceovers_list.py
 
-      - name: Create Addon ZIP
+      # One ZIP per addon folder (one folder per locale), e.g.
+      # ChattyLittleNpc_Vanilla_enUS_voiceovers-v3.3.4.zip and ChattyLittleNpc_Vanilla_deDE_voiceovers-v3.3.4.zip
+      - name: Create Addon ZIPs
         run: |
-          zip -r "ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip" ChattyLittleNpc_Vanilla_voiceovers
+          mkdir dist
+          for dir in */; do
+            name="${dir%/}"
+            [ -f "$name/$name.toc" ] || continue
+            zip -r "dist/$name-${{ github.ref_name }}.zip" "$name" -x "$name/.vscode/*"
+          done
+          ls -lh dist
+          [ -n "$(ls dist)" ] || { echo "No addon folders found"; exit 1; }
 
-      - name: Upload ZIP to GitHub Release
+      - name: Upload ZIPs to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: "ChattyLittleNpc_Vanilla_voiceovers-${{ github.ref_name }}.zip"
+          files: dist/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

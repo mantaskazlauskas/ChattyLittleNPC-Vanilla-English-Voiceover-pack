@@ -33,12 +33,13 @@ VERSION_LABELS = {
 ADDONS_RELATIVE = os.path.join("Interface", "AddOns")
 
 
-def find_addon_source():
+def find_addon_sources():
     """
-    Return the absolute path to the addon folder next to this script.
+    Return the absolute paths to the addon folders next to this script.
 
     An addon folder is a subdirectory containing <same-name>.toc, which is the
     layout WoW itself requires, so this cannot pick the wrong directory.
+    Voiceover repos may hold one addon folder per locale.
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,13 +57,31 @@ def find_addon_source():
         print("       e.g. ChattyLittleGossipTracker/ChattyLittleGossipTracker.toc")
         sys.exit(1)
 
-    if len(matches) > 1:
-        print("ERROR: More than one addon folder found:")
-        for m in matches:
-            print(f"       {os.path.basename(m)}")
-        sys.exit(1)
+    return matches
 
-    return matches[0]
+
+def prompt_addons(sources):
+    """When there is more than one addon folder, ask which to deploy. Returns a list."""
+    if len(sources) == 1:
+        return sources
+
+    print()
+    print("Available addon folders:")
+    print()
+    for i, source in enumerate(sources, start=1):
+        print(f"  [{i}] {os.path.basename(source)}")
+    print("  [a] All of the above")
+    print()
+
+    while True:
+        raw = input(f"Select addon [1-{len(sources)}, a]: ").strip().lower()
+        if raw == "a":
+            return sources
+        if raw.isdigit():
+            choice = int(raw)
+            if 1 <= choice <= len(sources):
+                return [sources[choice - 1]]
+        print(f"  Please enter a number between 1 and {len(sources)}, or 'a'.")
 
 
 def discover_versions(wow_root):
@@ -134,10 +153,10 @@ def deploy(source_dir, addons_dir, addon_name):
 
 
 def main():
-    source_dir = find_addon_source()
-    addon_name = os.path.basename(source_dir)
+    source_dirs = prompt_addons(find_addon_sources())
 
-    print(f"Addon source : {source_dir}")
+    for source_dir in source_dirs:
+        print(f"Addon source : {source_dir}")
     print(f"WoW root     : {WOW_ROOT}")
 
     versions = discover_versions(WOW_ROOT)
@@ -153,7 +172,8 @@ def main():
         print("Aborted.")
         sys.exit(0)
 
-    deploy(source_dir, addons_dir, addon_name)
+    for source_dir in source_dirs:
+        deploy(source_dir, addons_dir, os.path.basename(source_dir))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
----@class ChattyLittleNpc_Vanilla_voiceovers
-local ChattyLittleNpc_Vanilla_voiceovers = _G["ChattyLittleNpc_Vanilla_voiceovers"]
+---@class ChattyLittleNpc_Vanilla_enUS_voiceovers
+local ChattyLittleNpc_Vanilla_enUS_voiceovers = _G["ChattyLittleNpc_Vanilla_enUS_voiceovers"]
 
-ChattyLittleNpc_Vanilla_voiceovers.Voiceovers = {
+ChattyLittleNpc_Vanilla_enUS_voiceovers.Voiceovers = {
     '1000_Comp.ogg',
     '1000_Desc.ogg',
     '1001_Comp.ogg',
@@ -20852,7 +20852,7 @@ ChattyLittleNpc_Vanilla_voiceovers.Voiceovers = {
     '9_Prog.ogg',
 }
 
-ChattyLittleNpc_Vanilla_voiceovers.VoiceoverDurations = {
+ChattyLittleNpc_Vanilla_enUS_voiceovers.VoiceoverDurations = {
     ["1000_Comp.ogg"] = 26.58,
     ["1000_Desc.ogg"] = 27.19,
     ["1001_Comp.ogg"] = 28.83,

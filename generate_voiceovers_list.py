@@ -1,4 +1,17 @@
+"""
+Generate VoiceoversList.lua for each voiceover pack addon folder.
+
+An addon folder is a subdirectory containing <same-name>.toc, one per locale:
+    ChattyLittleNpc_Vanilla_enUS_voiceovers/   -> English
+    ChattyLittleNpc_Vanilla_deDE_voiceovers/   -> German
+
+Usage:
+    python generate_voiceovers_list.py                 # every addon folder
+    python generate_voiceovers_list.py <addon_folder>  # just that one
+"""
+
 import os
+import sys
 
 try:
     from mutagen.oggvorbis import OggVorbis
@@ -23,10 +36,27 @@ def get_audio_duration(file_path):
         return None
 
 
-def generate_voiceovers_lua_file(folder_path, output_file):
-    """Scan the specified folder for audio files and generate a Lua file with paths and durations."""
-    addon_name = os.path.basename(os.path.dirname(os.path.abspath(folder_path)))
-    
+def find_addon_folders(root):
+    """Return the addon folders under root, i.e. subdirectories containing <same-name>.toc."""
+    folders = []
+    for entry in sorted(os.listdir(root)):
+        candidate = os.path.join(root, entry)
+        if not os.path.isdir(candidate) or entry.startswith('.'):
+            continue
+        if os.path.isfile(os.path.join(candidate, f"{entry}.toc")):
+            folders.append(candidate)
+    return folders
+
+
+def generate_voiceovers_lua_file(addon_folder):
+    """Scan addon_folder/voiceovers for audio files and write addon_folder/VoiceoversList.lua."""
+    addon_name = os.path.basename(os.path.abspath(addon_folder))
+    folder_path = os.path.join(addon_folder, "voiceovers")
+    output_file = os.path.join(addon_folder, "VoiceoversList.lua")
+
+    if not os.path.isdir(folder_path):
+        print(f"Warning: {folder_path} not found; {output_file} will be empty")
+
     voiceovers = []
     durations = {}
     
@@ -65,8 +95,19 @@ def generate_voiceovers_lua_file(folder_path, output_file):
     print(f"Generated {output_file} with {len(voiceovers)} voiceovers and {len(durations)} durations")
 
 
-# Specify the folder path and output Lua file path
-folder_path = "voiceovers"
-output_file = "VoiceoversList.lua"
+def main():
+    if len(sys.argv) > 1:
+        addon_folders = sys.argv[1:]
+    else:
+        addon_folders = find_addon_folders(os.path.dirname(os.path.abspath(__file__)))
 
-generate_voiceovers_lua_file(folder_path, output_file)
+    if not addon_folders:
+        print("Error: no addon folders found (expected <Name>/<Name>.toc)")
+        sys.exit(1)
+
+    for addon_folder in addon_folders:
+        generate_voiceovers_lua_file(addon_folder)
+
+
+if __name__ == '__main__':
+    main()

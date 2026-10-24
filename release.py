@@ -17,21 +17,35 @@ import sys
 import argparse
 
 
-def find_toc_file():
-    """Find the .toc file in the current directory or subdirectories."""
+# Locale packs are named <Addon>_<locale>_voiceovers (e.g. _enUS_, _deDE_); a pack without
+# a suffix is also English (legacy naming).
+LOCALE_PACK_RE = re.compile(r'_([a-z]{2}[A-Z]{2})_voiceovers$')
+
+
+def find_toc_files():
+    """Find .toc files in the current directory or its immediate subdirectories."""
     # First check current directory
-    for file in os.listdir('.'):
-        if file.endswith('.toc'):
-            return file
-    
+    tocs = [file for file in sorted(os.listdir('.')) if file.endswith('.toc')]
+    if tocs:
+        return tocs
+
     # Check immediate subdirectories (for repo root)
-    for item in os.listdir('.'):
-        if os.path.isdir(item):
-            for file in os.listdir(item):
+    for item in sorted(os.listdir('.')):
+        if os.path.isdir(item) and not item.startswith('.'):
+            for file in sorted(os.listdir(item)):
                 if file.endswith('.toc'):
-                    return os.path.join(item, file)
-    
-    return None
+                    tocs.append(os.path.join(item, file))
+
+    return tocs
+
+
+def pick_primary_toc(toc_paths):
+    """The release version comes from the English pack; fall back to the first .toc."""
+    for toc_path in toc_paths:
+        match = LOCALE_PACK_RE.search(get_addon_name_from_toc(toc_path))
+        if not match or match.group(1) == 'enUS':
+            return toc_path
+    return toc_paths[0] if toc_paths else None
 
 
 def get_version_from_toc(toc_path):
@@ -86,13 +100,16 @@ def main():
                         help='Release type: release (default), beta, or alpha. Appends -beta/-alpha suffix to tag.')
     args = parser.parse_args()
 
-    # Find .toc file
-    toc_path = find_toc_file()
+    # Find .toc files (one per locale pack)
+    toc_paths = find_toc_files()
+    toc_path = pick_primary_toc(toc_paths)
     if not toc_path:
         print("Error: No .toc file found in current directory or subdirectories")
         sys.exit(1)
-    
-    print(f"Found .toc file: {toc_path}")
+
+    for path in toc_paths:
+        print(f"Found .toc file: {path} (version {get_version_from_toc(path)})")
+    print(f"Release version taken from: {toc_path}")
 
     # Get version
     version = get_version_from_toc(toc_path)
@@ -109,6 +126,13 @@ def main():
     print(f"Tag: {tag_name}")
     print(f"Release type: {args.release_type}")
     print()
+
+    mismatched = [path for path in toc_paths if get_version_from_toc(path) != version]
+    if mismatched:
+        print("Warning: these packs have a different ## Version and will still be built under this tag:")
+        for path in mismatched:
+            print(f"  {path}: {get_version_from_toc(path)}")
+        print()
 
     # Check prerequisites
     if not check_gh_cli():
@@ -158,7 +182,7 @@ def main():
     
     print()
     print(f"Done! Release {tag_name} created.")
-    print("The GitHub Actions workflow will now build and attach the addon ZIP.")
+    print("The GitHub Actions workflow will now build and attach one addon ZIP per locale.")
 
 
 if __name__ == '__main__':
