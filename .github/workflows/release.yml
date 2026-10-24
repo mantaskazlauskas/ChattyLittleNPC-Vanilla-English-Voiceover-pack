@@ -9,6 +9,8 @@ permissions:
 
 jobs:
   build:
+    # Only the repository owner may publish packs; releases by anyone else build nothing.
+    if: github.actor == github.repository_owner
     runs-on: ubuntu-latest
 
     steps:

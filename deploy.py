@@ -17,6 +17,7 @@ import stat
 import sys
 import shutil
 
+# Maintainer's install path -- change this to wherever World of Warcraft is installed on your machine.
 WOW_ROOT = r"D:\Games\World of Warcraft"
 
 # Human-readable labels for known WoW version folders
