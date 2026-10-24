@@ -5,7 +5,7 @@ AI-generated voiceover packs for the [ChattyLittleNPC](https://github.com/mantas
 
 ### Installing
 1. Install ChattyLittleNPC.
-2. Download the ZIP for your language from the [Releases](https://github.com/mantaskazlauskas/ChattyLittleNPC-Vanilla-English-Voiceover-pack/releases) page, e.g. `ChattyLittleNpc_Vanilla_enUS_voiceovers-v3.3.5.zip`.
+2. Download the ZIP for your language from the [Releases](https://github.com/mantaskazlauskas/ChattyLittleNPC-Vanilla-Voiceovers/releases) page, e.g. `ChattyLittleNpc_Vanilla_enUS_voiceovers-v3.3.5.zip`.
 3. Extract it into `World of Warcraft/<version>/Interface/AddOns/`. You should end up with `Interface/AddOns/ChattyLittleNpc_Vanilla_enUS_voiceovers/`.
 
 By default, ChattyLittleNPC plays voiceovers in your game client's language if a pack for it is installed, and English otherwise. When your language's pack has no recording for a line, it plays the English one. Install the English pack as well to get that fallback. You can pick the language and turn the fallback off in ChattyLittleNPC's settings.
@@ -82,7 +82,12 @@ The release workflow regenerates the list too, so a stale committed list can't e
 ```powershell
 .venv\Scripts\python deploy.py
 ```
-The script asks which pack to deploy (or `a` for all of them) and which WoW version (Retail, Classic Era, Anniversary, ...). It then replaces that pack's folder in `Interface/AddOns`. Run `/reload` in game, or restart the client if you added new files.
+The script asks three things:
+1. **Language:** which pack to deploy. Press Enter for `enUS`, pick a number for another language, or `a` for all of them. This step is skipped when there is only one pack.
+2. **WoW version:** Retail, Classic Era, Anniversary, and so on.
+3. **Confirmation:** it lists the pack(s) and the target folder. Type `y` to go ahead.
+
+It then replaces the pack's folder in that version's `Interface/AddOns`. Run `/reload` in game, or restart the client if you added new files.
 
 ### Releasing
 **Only the repository owner (@mantaskazlauskas) publishes releases.** Contributors: open a pull request with your changes, and the owner will release them. What enforces this is write access: creating tags and releases needs it, and only the owner has it. As a safety net against accidental releases, the release workflow also skips building unless the owner published the release.
